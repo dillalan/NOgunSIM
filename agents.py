@@ -30,8 +30,10 @@ class Aggressor:
         self.s_aggressor = None
 
     def is_active(self):
-        if self.wallet < 20:
+        if self.wallet < 45:
             return True
+        else:
+            return False
 
     def set_strategy(self, suspicious):
         if suspicious:
@@ -46,6 +48,6 @@ class Aggressor:
 if __name__ == '__main__':
     Carlos = Aggressor(1)
     Carlos.set_strategy(False)
-    print(Carlos.s_aggressor)
-    print(Carlos.s_aggressor[0])
+    print(Carlos.wallet)
+    print(Carlos.is_active())
 
