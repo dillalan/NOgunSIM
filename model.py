@@ -5,7 +5,7 @@ import random
 
 class GunSIM:
     def __init__(self):
-        self.policy = True
+        self.policy = False
         self.victims = list()
         self.muggers = list()
         self.grow_victims()
@@ -35,7 +35,7 @@ class GunSIM:
 
     def theory_moves(self, victim, mugger):
         """
-        A function that change the agent's strategy based on Theory of Moves from Steven Brams(1993)
+        A function that may change the agent's strategy based on Theory of Moves from Steven Brams(1993)
         :param victim:
         :param mugger:
         :return:
@@ -86,18 +86,25 @@ class GunSIM:
 
     def step(self):
         """
-        A function where the interaction of agents
+        A function that mimics a unit of time. All the interactions are executed
         :return:
         """
+        # Each victim from a list of victims will be matched with one of the following options: a bad guy(a.k.a. a
+        # potential  aggressor); other citizen; None, meaning no match.
         for victim in self.victims:
             match = random.choice(['bad_guy', 'other', None])
+        # Each match of a potential victim with a potential mugger can trigger a criminal activity
             if match == 'bad_guy':
                 mugger = random.choice(self.muggers)
                 if mugger.is_active:
+                    # If criminal activity is triggered aggressor and victim make a initial decision on its response
+                    # strategy. Note that agents take into account the existence of a policy.
                     mugger.set_strategy(suspicious=self.policy)
                     victim.set_strategy(self.policy)
+                    # Next its applied the Theory of Moves(BRAMS, 1993), a rationale for changing or not the previous
+                    # strategy set by victim and aggressor
                     self.theory_moves(victim, mugger)
 
 
 if __name__ == '__main__':
-    r = GunSIM()
+    brazil = GunSIM()
