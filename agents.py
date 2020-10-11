@@ -15,7 +15,7 @@ class Victim:
     def set_strategy(self, prob_armed):
         if prob_armed:
             if self.has_gun[0]:
-                self.s_victim = random.choice(['React', 'Coop'])
+                self.s_victim = random.choices(['React', 'Coop'])
             else:
                 self.s_victim = random.choices(['React', 'Coop'], [.2, .8])
         else:
@@ -46,8 +46,4 @@ class Aggressor:
 
 
 if __name__ == '__main__':
-    Carlos = Aggressor(1)
-    Carlos.set_strategy(False)
-    print(Carlos.wallet)
-    print(Carlos.is_active())
-
+    pass

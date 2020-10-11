@@ -4,18 +4,16 @@ import random
 
 
 class GunSIM:
-    def __init__(self):
-        self.policy = False
+    def __init__(self, policy):
+        self.policy = policy
         self.victims = list()
         self.muggers = list()
         self.i = 0
         self.ii = 0
         self.iii = 0
         self.iv = 0
-        self.grow_victims()
-        self.grow_robbers()
-        self.step()
-        self.counter()
+        self.homicide = 0
+        self.jailed = 0
 
     def grow_victims(self, n=200):
         """
@@ -26,8 +24,9 @@ class GunSIM:
         for i in range(n):
             self.victims.append(Victim(unique_id=i))
             if self.policy:
-                for v in range(len(self.victims)):
-                    self.victims[i].has_gun = random.choices([True, False], [.1, .9])
+                self.victims[i].has_gun = random.choices([True, False], [.5, .5])
+            else:
+                self.victims[i].has_gun = False
 
     def grow_robbers(self, n=20):
         """
@@ -47,7 +46,7 @@ class GunSIM:
         """
         if mugger.s_aggressor[0] == 'Force' and victim.s_victim[0] == 'Coop':
             victim.s_victim[0] = random.choice(['Coop', 'React'])
-        if mugger.s_aggressor[0] == 'nForce' and victim.s_victim[0] == 'React':
+        elif mugger.s_aggressor[0] == 'nForce' and victim.s_victim == 'React':
             victim.s_victim[0] = random.choice(['Coop', 'React'])
             if victim.s_victim[0] == 'React':
                 mugger.s_aggressor[0] = random.choice(['nForce', 'Force'])
@@ -68,36 +67,38 @@ class GunSIM:
             self.i += 1
             if random.choice(['survive', 'perish']) == 'perish':
                 self.victims.remove(victim)
+                self.homicide += 1
             if random.choices(['flew', 'caught'], [.7, .3]) == 'caught':
                 self.muggers.remove(mugger)
+                self.jailed += 1
         # II Mugger fails: (4, 1). The victim resists the mugger, who is frightened away, and achieves all its goals.
         # The mugger achieves only its tertiary goal.
-        if victim.s_victim[0] == 'React' and mugger.s_aggressor[0] == 'nForce':
+        elif victim.s_victim[0] == 'React' and mugger.s_aggressor[0] == 'nForce':
             self.ii += 1
             if random.choices(['flew', 'caught'], [.7, .3]) == 'caught':
                 self.muggers.remove(mugger)
+                self.jailed += 1
         # III Voluntary submission: (3,4). The victim gives up its money, and the mugger leaves the victim
         # unharmed. The mugger achieves all its goals, whereas the victim achieves its primary goal of escaping
         # unharmed.
-        if victim.s_victim[0] == 'Coop' and mugger.s_aggressor[0] == 'nForce':
+        elif victim.s_victim[0] == 'Coop' and mugger.s_aggressor[0] == 'nForce':
             self.iii += 1
             mugger.wallet += victim.wallet
         # IV Involuntary submission: ( 1 ,3). The victim gives up its money, but the mugger uses force anyway. The
         # victim achieves none of its goals, whereas the mugger achieves its two most important goals, sacrificing
         # only its tertiary goal by taking a greater risk of getting caught.
-        if victim.s_victim[0] == 'Coop' and mugger.s_aggressor[0] == 'Force':
+        elif victim.s_victim[0] == 'Coop' and mugger.s_aggressor[0] == 'Force':
             self.iv += 1
             mugger.wallet += victim.wallet
             if random.choices(['survive', 'perish'], [.9, .1]) == 'perish':
                 self.victims.remove(victim)
+                self.homicide += 1
             if random.choices(['flew', 'caught'], [.7, .3]) == 'caught':
                 self.muggers.remove(mugger)
+                self.jailed += 1
 
-    def counter(self):
-        print(self.i)
-        print(self.ii)
-        print(self.iii)
-        print(self.iv)
+    def return_counter(self):
+        return self.i, self.ii, self.iii, self.iv, self.homicide, self.jailed
 
     def step(self):
         """
@@ -122,4 +123,8 @@ class GunSIM:
 
 
 if __name__ == '__main__':
-    brazil = GunSIM()
+    brazil = GunSIM(policy=True)
+    brazil.grow_robbers()
+    brazil.grow_victims()
+    brazil.step()
+    print(brazil.return_counter())
