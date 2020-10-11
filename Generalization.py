@@ -23,7 +23,7 @@ def run_model(policy, rep=365):
     print(f"Policy:{policy} → I - {sum_i}; II - {sum_ii}; III - {sum_iii}; IV - {sum_iv}")
     print(
         f"Policy:{policy} → I - {sum_i/overall}; II - {sum_ii/overall}; III - {sum_iii/overall}; IV - {sum_iv/overall}")
-    print(f"Policy:{policy} → Homicides:{sum_homicide,}; Arrests:{sum_jailed}")
+    print(f"Policy:{policy} → Homicides:{sum_homicide}; Arrests:{sum_jailed}")
 
 
 if __name__ == '__main__':

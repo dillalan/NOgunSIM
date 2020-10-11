@@ -23,6 +23,7 @@ class GunSIM:
         """
         for i in range(n):
             self.victims.append(Victim(unique_id=i))
+            # If a gun policy is active, there is a probability that the agent will posses a gun.
             if self.policy:
                 self.victims[i].has_gun = random.choices([True, False], [.5, .5])
             else:
@@ -44,12 +45,17 @@ class GunSIM:
         :param mugger:
         :return:
         """
+        # Once each agent, mugger and victim, set a initial strategy, according to Theory of Moves(BRAMS, 1993),
+        # individuals can make 'moves' in his initial position, changing the strategy base in a rational calculation
+        # that leads to a better final outcome. Here, the changes may happen according to a probability.
         if mugger.s_aggressor[0] == 'Force' and victim.s_victim[0] == 'Coop':
             victim.s_victim[0] = random.choice(['Coop', 'React'])
         elif mugger.s_aggressor[0] == 'nForce' and victim.s_victim == 'React':
             victim.s_victim[0] = random.choice(['Coop', 'React'])
             if victim.s_victim[0] == 'React':
                 mugger.s_aggressor[0] = random.choice(['nForce', 'Force'])
+        # Since the agents are satisfied with their chosen strategies we call a method to give the outcome to each
+        # player. This distribution of rewards follows the structure of the Mugging Game(BRAMS, 1993)
         self.mugging_game(victim, mugger)
 
     def mugging_game(self, victim, mugger):
@@ -65,17 +71,17 @@ class GunSIM:
         if victim.s_victim[0] == 'React' and mugger.s_aggressor[0] == 'Force':
             mugger.wallet += victim.wallet
             self.i += 1
-            if random.choice(['survive', 'perish']) == 'perish':
+            if random.choices(['survive', 'perish']) == ['perish']:
                 self.victims.remove(victim)
                 self.homicide += 1
-            if random.choices(['flew', 'caught'], [.7, .3]) == 'caught':
+            if random.choices(['flew', 'caught'], [.7, .3]) == ['caught']:
                 self.muggers.remove(mugger)
                 self.jailed += 1
         # II Mugger fails: (4, 1). The victim resists the mugger, who is frightened away, and achieves all its goals.
         # The mugger achieves only its tertiary goal.
         elif victim.s_victim[0] == 'React' and mugger.s_aggressor[0] == 'nForce':
             self.ii += 1
-            if random.choices(['flew', 'caught'], [.7, .3]) == 'caught':
+            if random.choices(['flew', 'caught'], [.7, .3]) == ['caught']:
                 self.muggers.remove(mugger)
                 self.jailed += 1
         # III Voluntary submission: (3,4). The victim gives up its money, and the mugger leaves the victim
@@ -90,10 +96,10 @@ class GunSIM:
         elif victim.s_victim[0] == 'Coop' and mugger.s_aggressor[0] == 'Force':
             self.iv += 1
             mugger.wallet += victim.wallet
-            if random.choices(['survive', 'perish'], [.9, .1]) == 'perish':
+            if random.choices(['survive', 'perish'], [.9, .1]) == ['perish']:
                 self.victims.remove(victim)
                 self.homicide += 1
-            if random.choices(['flew', 'caught'], [.7, .3]) == 'caught':
+            if random.choices(['flew', 'caught'], [.7, .3]) == ['caught']:
                 self.muggers.remove(mugger)
                 self.jailed += 1
 
