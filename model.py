@@ -74,7 +74,7 @@ class GunSIM:
             if random.choices(['survive', 'perish']) == ['perish']:
                 self.victims.remove(victim)
                 self.homicide += 1
-            if random.choices(['flew', 'caught'], [.7, .3]) == ['caught']:
+            if random.choices(['flew', 'caught'], [.5, .5]) == ['caught']:
                 self.muggers.remove(mugger)
                 self.jailed += 1
         # II Mugger fails: (4, 1). The victim resists the mugger, who is frightened away, and achieves all its goals.
@@ -96,10 +96,10 @@ class GunSIM:
         elif victim.s_victim[0] == 'Coop' and mugger.s_aggressor[0] == 'Force':
             self.iv += 1
             mugger.wallet += victim.wallet
-            if random.choices(['survive', 'perish'], [.9, .1]) == ['perish']:
+            if random.choices(['survive', 'perish'], [.7, .3]) == ['perish']:
                 self.victims.remove(victim)
                 self.homicide += 1
-            if random.choices(['flew', 'caught'], [.7, .3]) == ['caught']:
+            if random.choices(['flew', 'caught'], [.5, .5]) == ['caught']:
                 self.muggers.remove(mugger)
                 self.jailed += 1
 
