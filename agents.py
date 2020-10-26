@@ -26,7 +26,7 @@ class Victim:
             else:
                 self.s_victim = random.choices(['React', 'Coop'], [.2, .8])
         else:
-            self.s_victim = random.choices(['React', 'Coop'], [.2, .8])
+            self.s_victim = random.choices(['React', 'Coop'], [.5, .5])
 
 
 class Aggressor:

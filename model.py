@@ -4,8 +4,9 @@ import random
 
 
 class GunSIM:
-    def __init__(self, policy):
-        self.policy = policy
+    def __init__(self, policy_mugger, policy_victim):
+        self.policy_mugger = policy_mugger
+        self.policy_victim = policy_victim
         self.victims = list()
         self.muggers = list()
         self.i = 0
@@ -24,7 +25,7 @@ class GunSIM:
         for i in range(n):
             self.victims.append(Victim(unique_id=i))
             # If a gun policy is active, there is a probability that the agent will posses a gun.
-            if self.policy:
+            if self.policy_victim:
                 self.victims[i].has_gun = random.choices([True, False], [.5, .5])
             else:
                 self.victims[i].has_gun = False
@@ -111,25 +112,24 @@ class GunSIM:
         A function that mimics a unit of time. All the interactions are executed
         :return:
         """
-        # Each victim from a list of victims will be matched with one of the following options: a bad guy(a.k.a. a
-        # potential  aggressor); other citizen; None, meaning no match.
+        # Each victim from a list of victims have a 33% of chance of being mugged(e.g. being matched with a mugger).
         for victim in self.victims:
-            match = random.choice(['bad_guy', 'other', None])
+            match = random.random() < .33
             # Each match of a potential victim with a potential mugger can trigger a criminal activity
-            if match == 'bad_guy':
+            if match:
                 mugger = random.choice(self.muggers)
                 if mugger.is_active():
                     # If criminal activity is triggered aggressor and victim make a initial decision on its response
                     # strategy. Note that agents take into account the existence of a policy.
-                    mugger.set_strategy(suspicious=self.policy)
-                    victim.set_strategy(self.policy)
+                    mugger.set_strategy(suspicious=self.policy_mugger)
+                    victim.set_strategy(self.policy_victim)
                     # Next its applied the Theory of Moves(BRAMS, 1993), a rationale for changing or not the previous
                     # strategy set by victim and aggressor
                     self.theory_moves(victim, mugger)
 
 
 if __name__ == '__main__':
-    brazil = GunSIM(policy=True)
+    brazil = GunSIM(policy_victim=True, policy_mugger=True)
     brazil.grow_robbers()
     brazil.grow_victims()
     brazil.step()
