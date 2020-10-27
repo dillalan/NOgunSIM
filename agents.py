@@ -22,9 +22,9 @@ class Victim:
         # The rationale is that an armed agent is prone to chose react more often than an unarmed agent.
         if prob_armed:
             if self.has_gun[0]:
-                self.s_victim = random.choices(['React', 'Coop'])
+                self.s_victim = random.choices(['React', 'Coop'], [.8, .2])
             else:
-                self.s_victim = random.choices(['React', 'Coop'], [.2, .8])
+                self.s_victim = random.choices(['React', 'Coop'], [.1, .9])
         else:
             self.s_victim = random.choices(['React', 'Coop'], [.5, .5])
 
@@ -42,7 +42,7 @@ class Aggressor:
         the monetary units in agent's wallet
         :return: boolean
         """
-        if self.wallet < 45:
+        if self.wallet < 25:
             return True
         else:
             return False
@@ -55,9 +55,9 @@ class Aggressor:
         """
         # The rationale is that if a gun policy is active the agent chose more often to use force as a initial strategy
         if suspicious:
-            self.s_aggressor = random.choices(['Force', 'nForce'], [.7, .3])
+            self.s_aggressor = random.choices(['Force', 'nForce'], [.5, .5])
         else:
-            self.s_aggressor = random.choices(['Force', 'nForce'], [.3, .7])
+            self.s_aggressor = random.choices(['Force', 'nForce'], [.2, .8])
 
     def __repr__(self):
         return f'ID: {self.unique_id}'

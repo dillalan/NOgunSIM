@@ -31,9 +31,9 @@ def run_model(policy_mugger, policy_victim, rep=365):
 
 if __name__ == '__main__':
     run_model(False, False)
+    print('\n')
+    #run_model(True, True)
     # print('\n')
-    # run_model(True, True)
+    run_model(False, True)
     # print('\n')
-    # run_model(False, True)
-    # print('\n')
-    # run_model(True, False)
+    #run_model(True, False)
