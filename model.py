@@ -49,25 +49,18 @@ class GunSIM:
         # Once each agent, mugger and victim, set a initial strategy, according to Theory of Moves(BRAMS, 1993),
         # individuals can make 'moves' in his initial position, changing the strategy base in a rational calculation
         # that leads to a better final outcome. Here, the changes may happen according to a probability.
-        if mugger.s_aggressor[0] == 'nForce' and victim.s_victim[0] == 'Coop':
-            victim.s_victim[0] = 'Coop' if random.random() < .90 else 'React'
-        elif mugger.s_aggressor[0] == 'nForce' and victim.s_victim[0] == 'React':
-            victim.s_victim[0] = 'React' if random.random() < .05 else 'Coop'
-        elif mugger.s_aggressor[0] == 'Force' and victim.s_victim[0] == 'Coop':
-            victim.s_victim[0] = 'Coop' if random.random() < .85 else 'React'
-        elif mugger.s_aggressor[0] == 'Force' and victim.s_victim[0] == 'React':
-            victim.s_victim[0] = 'React' if random.random() < .38 else 'Coop'
 
-        # if mugger.s_aggressor[0] == 'nForce':
-        #     victim.s_victim[0] = 'Coop' if random.random() < .92 else 'React'
-        # elif mugger.s_aggressor[0] == 'Force':
-        #     victim.s_victim[0] = 'React' if random.random() < .08 else 'Coop'
-        # elif victim.s_victim[0] == 'Coop':
-        #     mugger.s_aggressor[0] = 'Force' if random.random() < .14 else 'nForce'
-        # elif victim.s_victim[0] == 'React':
-        #     mugger.s_aggressor[0] = 'Force' if random.random() < .86 else 'nForce'
-        # Since the agents are satisfied with their chosen strategies we call a method to give the outcome to each
-        # player. This distribution of rewards follows the structure of the Mugging Game(BRAMS, 1993)
+        # According to Brams the initial states are (4, 1 )("mugger fails") or (3,4) ("voluntary submission")
+        if mugger.s_aggressor[0] == 'nForce':
+            if victim.s_victim[0] == 'Coop':  # It is rational to prefer stand in (3,4) ("voluntary submission")
+                victim.s_victim[0] = 'Coop' if random.random() < .86 else 'React'
+            elif victim.s_victim[0] == 'React':   # So it is changing from (4,1) ("voluntary submission") to (3,4)
+                victim.s_victim[0] = 'Coop' if random.random() < .9 else 'React'
+                if victim.s_victim[0] == 'React':  # But if victim remain resistant, it is rational to mugger use force
+                    mugger.s_aggressor[0] = 'Force' if random.random() < .9 else 'nForce'
+        elif mugger.s_aggressor[0] == 'Force':
+            victim.s_victim[0] = 'Coop' if random.random() < .95 else 'React'
+
         self.mugging_game(victim, mugger)
 
     def mugging_game(self, victim, mugger):
@@ -83,7 +76,7 @@ class GunSIM:
         if victim.s_victim[0] == 'React' and mugger.s_aggressor[0] == 'Force':
             mugger.wallet += victim.wallet
             self.i += 1
-            if random.choices(['survive', 'perish'], [.82, .18]) == ['perish']:
+            if random.choices(['survive', 'perish'], [.9, .1]) == ['perish']:
                 self.victims.remove(victim)
                 self.homicide += 1
             if random.choices(['flew', 'caught'], [.5, .5]) == ['caught']:
@@ -108,7 +101,7 @@ class GunSIM:
         elif victim.s_victim[0] == 'Coop' and mugger.s_aggressor[0] == 'Force':
             self.iv += 1
             mugger.wallet += victim.wallet
-            if random.choices(['survive', 'perish'], [.95, .05]) == ['perish']:
+            if random.choices(['survive', 'perish'], [.93, .07]) == ['perish']:
                 self.victims.remove(victim)
                 self.homicide += 1
             if random.choices(['flew', 'caught'], [.5, .5]) == ['caught']:

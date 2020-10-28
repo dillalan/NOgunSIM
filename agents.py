@@ -22,9 +22,9 @@ class Victim:
         # The rationale is that an armed agent is prone to chose react more often than an unarmed agent.
         if prob_armed:
             if self.has_gun[0]:
-                self.s_victim = random.choices(['React', 'Coop'], [.8, .2])
+                self.s_victim = random.choices(['React', 'Coop'], [.6, .4])
             else:
-                self.s_victim = random.choices(['React', 'Coop'], [.1, .9])
+                self.s_victim = random.choices(['React', 'Coop'], [.4, .6])
         else:
             self.s_victim = random.choices(['React', 'Coop'], [.5, .5])
 
@@ -57,7 +57,7 @@ class Aggressor:
         if suspicious:
             self.s_aggressor = random.choices(['Force', 'nForce'], [.5, .5])
         else:
-            self.s_aggressor = random.choices(['Force', 'nForce'], [.2, .8])
+            self.s_aggressor = random.choices(['Force', 'nForce'], [.14, .86])
 
     def __repr__(self):
         return f'ID: {self.unique_id}'
