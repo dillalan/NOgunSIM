@@ -15,6 +15,7 @@ class GunSIM:
         self.iv = 0
         self.homicide = 0
         self.jailed = 0
+        self.guns = 0
 
     def grow_victims(self, n=500):
         """
@@ -26,7 +27,9 @@ class GunSIM:
             self.victims.append(Victim(unique_id=i))
             # If a gun policy is active, there is a probability that the agent will posses a gun.
             if self.policy_victim:
-                self.victims[i].has_gun = random.choices([True, False], [.1, .9])
+                self.victims[i].has_gun = random.choices([True, False], [.0057, .9953])
+                if self.victims[i].has_gun[0]:
+                    self. guns += 1
             else:
                 self.victims[i].has_gun = False
 
@@ -109,7 +112,7 @@ class GunSIM:
                 self.jailed += 1
 
     def return_counter(self):
-        return self.i, self.ii, self.iii, self.iv, self.homicide, self.jailed
+        return self.i, self.ii, self.iii, self.iv, self.homicide, self.jailed, self.guns
 
     def step(self):
         """
