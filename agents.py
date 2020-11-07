@@ -64,4 +64,4 @@ class Aggressor:
 
 
 if __name__ == '__main__':
-    pass
+    a = Victim(1)

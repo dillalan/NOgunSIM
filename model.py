@@ -3,6 +3,18 @@ from agents import Aggressor
 import random
 
 
+def start_sankey(agent_m, agent_v):
+    with open('start.txt', 'a') as f:
+        f.write(f'{agent_m.s_aggressor[0]}\n')
+        f.write(f'{agent_v.s_victim[0]}\n')
+
+
+def target_sankey(agent_m, agent_v):
+    with open('target.txt', 'a') as f:
+        f.write(f'{agent_m.s_aggressor[0]}\n')
+        f.write(f'{agent_v.s_victim[0]}\n')
+
+
 class GunSIM:
     def __init__(self, policy_mugger, policy_victim):
         self.policy_mugger = policy_mugger
@@ -29,7 +41,7 @@ class GunSIM:
             if self.policy_victim:
                 self.victims[i].has_gun = random.choices([True, False], [.0057, .9953])
                 if self.victims[i].has_gun[0]:
-                    self. guns += 1
+                    self.guns += 1
             else:
                 self.victims[i].has_gun = False
 
@@ -57,13 +69,13 @@ class GunSIM:
         if mugger.s_aggressor[0] == 'nForce':
             if victim.s_victim[0] == 'Coop':  # It is rational to prefer stand in (3,4) ("voluntary submission")
                 victim.s_victim[0] = 'Coop' if random.random() < .86 else 'React'
-            elif victim.s_victim[0] == 'React':   # So it is changing from (4,1) ("voluntary submission") to (3,4)
+            elif victim.s_victim[0] == 'React':  # So it is changing from (4,1) ("voluntary submission") to (3,4)
                 victim.s_victim[0] = 'Coop' if random.random() < .9 else 'React'
                 if victim.s_victim[0] == 'React':  # But if victim remain resistant, it is rational to mugger use force
                     mugger.s_aggressor[0] = 'Force' if random.random() < .9 else 'nForce'
         elif mugger.s_aggressor[0] == 'Force':
             victim.s_victim[0] = 'Coop' if random.random() < .95 else 'React'
-
+        target_sankey(mugger, victim)
         self.mugging_game(victim, mugger)
 
     def mugging_game(self, victim, mugger):
@@ -130,6 +142,7 @@ class GunSIM:
                     # strategy. Note that agents take into account the existence of a policy.
                     mugger.set_strategy(suspicious=self.policy_mugger)
                     victim.set_strategy(prob_armed=self.policy_victim)
+                    start_sankey(mugger, victim)
                     # Next its applied the Theory of Moves(BRAMS, 1993), a rationale for changing or not the previous
                     # strategy set by victim and aggressor
                     self.theory_moves(victim, mugger)
