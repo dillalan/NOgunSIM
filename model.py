@@ -16,7 +16,7 @@ def target_sankey(agent_m, agent_v):
 
 
 class GunSIM:
-    def __init__(self, policy_mugger, policy_victim):
+    def __init__(self, policy_mugger, policy_victim, has_gun=.0057, prob_matching=.33):
         self.policy_mugger = policy_mugger
         self.policy_victim = policy_victim
         self.victims = list()
@@ -28,6 +28,9 @@ class GunSIM:
         self.homicide = 0
         self.jailed = 0
         self.guns = 0
+        # Preparing for sensitivity analysis
+        self.has_gun = has_gun
+        self.prob_matching = prob_matching
 
     def grow_victims(self, n=500):
         """
@@ -39,7 +42,7 @@ class GunSIM:
             self.victims.append(Victim(unique_id=i))
             # If a gun policy is active, there is a probability that the agent will posses a gun.
             if self.policy_victim:
-                self.victims[i].has_gun = random.choices([True, False], [.0057, .9953])
+                self.victims[i].has_gun = random.choices([True, False], [self.has_gun, 1 - self.has_gun])
                 if self.victims[i].has_gun[0]:
                     self.guns += 1
             else:
@@ -124,7 +127,7 @@ class GunSIM:
                 self.jailed += 1
 
     def return_counter(self):
-        return self.i, self.ii, self.iii, self.iv, self.homicide, self.jailed, self.guns
+        return self.i, self.ii, self.iii, self.iv, self.homicide, self.jailed, self.guns, self.has_gun
 
     def step(self):
         """
@@ -133,7 +136,7 @@ class GunSIM:
         """
         # Each victim from a list of victims have a 33% of chance of being mugged(e.g. being matched with a mugger).
         for victim in self.victims:
-            match = random.random() < .33
+            match = random.random() < self.prob_matching
             # Each match of a potential victim with a potential mugger can trigger a criminal activity
             if match:
                 mugger = random.choice(self.muggers)

@@ -22,9 +22,9 @@ class Victim:
         # The rationale is that an armed agent is prone to chose react more often than an unarmed agent.
         if prob_armed:
             if self.has_gun[0]:
-                self.s_victim = random.choices(['React', 'Coop'], [.6, .4])
+                self.s_victim = random.choices(['React', 'Coop'], [.8, .2])
             else:
-                self.s_victim = random.choices(['React', 'Coop'], [.4, .6])
+                self.s_victim = random.choices(['React', 'Coop'], [.2, .8])
         else:
             self.s_victim = random.choices(['React', 'Coop'], [.5, .5])
 
@@ -55,7 +55,7 @@ class Aggressor:
         """
         # The rationale is that if a gun policy is active the agent chose more often to use force as a initial strategy
         if suspicious:
-            self.s_aggressor = random.choices(['Force', 'nForce'], [.5, .5])
+            self.s_aggressor = random.choices(['Force', 'nForce'], [.7, .4])
         else:
             self.s_aggressor = random.choices(['Force', 'nForce'], [.14, .86])
 
