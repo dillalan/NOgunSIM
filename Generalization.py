@@ -105,8 +105,8 @@ def save_statistics(homicides, gun_rate, i, ii, iii, iv, policy_mugger, policy_v
         f.write(f'Homicides; Gun Rate; Mugger Policy; Victim Policy\n')
         f.write(f'{homicides};{gun_rate}; {policy_mugger};{policy_victim}\n')
     with open('Mugging_Game.txt', 'a') as f:
-        f.write(f'I; II; III; IV\n')
-        f.write(f'{i};{ii};{iii};{iv}\n')
+        f.write(f'I; II; III; IV; Mugger Policy; Victim Policy\n')
+        f.write(f'{i};{ii};{iii};{iv};{policy_mugger};{policy_victim}\n')
 
 
 def run_model(policy_mugger, policy_victim, years=1, prob_matching=.33, gun_rate=.0057):
