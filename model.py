@@ -78,7 +78,7 @@ class GunSIM:
                     mugger.s_aggressor[0] = 'Force' if random.random() < .9 else 'nForce'
         elif mugger.s_aggressor[0] == 'Force':
             victim.s_victim[0] = 'Coop' if random.random() < .95 else 'React'
-        target_sankey(mugger, victim)
+        # target_sankey(mugger, victim)
         self.mugging_game(victim, mugger)
 
     def mugging_game(self, victim, mugger):
@@ -145,7 +145,7 @@ class GunSIM:
                     # strategy. Note that agents take into account the existence of a policy.
                     mugger.set_strategy(suspicious=self.policy_mugger)
                     victim.set_strategy(prob_armed=self.policy_victim)
-                    start_sankey(mugger, victim)
+                    # start_sankey(mugger, victim)
                     # Next its applied the Theory of Moves(BRAMS, 1993), a rationale for changing or not the previous
                     # strategy set by victim and aggressor
                     self.theory_moves(victim, mugger)

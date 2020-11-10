@@ -99,24 +99,30 @@ def save_res(i, ii, iii, iv):
         f.write(f'{iv}\n')
 
 
-def save_statistics(homicides, gun_rate, i, ii, iii, iv):
+def save_statistics(homicides, gun_rate, i, ii, iii, iv, policy_mugger, policy_victim):
     # Saving the values of homicides and gun rate
     with open('homicide.txt', 'a') as f:
-        f.write(f'{homicides};{gun_rate}\n')
+        f.write(f'Homicides; Gun Rate; Mugger Policy; Victim Policy\n')
+        f.write(f'{homicides};{gun_rate}; {policy_mugger};{policy_victim}\n')
     with open('Mugging_Game.txt', 'a') as f:
+        f.write(f'I; II; III; IV\n')
         f.write(f'{i};{ii};{iii};{iv}\n')
 
 
-def run_model(policy_mugger, policy_victim, years=10, prob_matching=.33, gun_rate=.0057):
-    sum_i = 0
-    sum_ii = 0
-    sum_iii = 0
-    sum_iv = 0
-    #sum_homicide = 0
+def run_model(policy_mugger, policy_victim, years=1, prob_matching=.33, gun_rate=.0057):
+    # sum_i = 0
+    # sum_ii = 0
+    # sum_iii = 0
+    # sum_iv = 0
+    # sum_homicide = 0
     sum_jailed = 0
     sum_guns = 0
-    overall = 0
+    # overall = 0
     for i in range(years):
+        sum_i = 0
+        sum_ii = 0
+        sum_iii = 0
+        sum_iv = 0
         sum_homicide = 0
         for days in range(365):
             sim = GunSIM(policy_mugger=policy_mugger, policy_victim=policy_victim,
@@ -131,46 +137,46 @@ def run_model(policy_mugger, policy_victim, years=10, prob_matching=.33, gun_rat
             sum_homicide += sim.return_counter()[4]
             sum_jailed += sim.return_counter()[5]
             sum_guns += sim.return_counter()[6]
-        overall = sum_i + sum_ii + sum_iii + sum_iv
-        save_statistics(sum_homicide, sim.return_counter()[7], sum_i, sum_ii, sum_iii, sum_iv)
-    save_res(sum_i, sum_ii, sum_iii, sum_iv)
-    print(f"Policy on Mugger:{policy_mugger}; Policy on Victim:{policy_victim} → "
-          f"I - {sum_i / years}; II - {sum_ii / years}; III - {sum_iii / years}; IV - {sum_iv / years}")
-    print(
-        f"Policy on Mugger:{policy_mugger}; Policy on Victim:{policy_victim} → "
-        f"I - {sum_i / overall}; II - {sum_ii / overall}; III - {sum_iii / overall}; IV - {sum_iv / overall}")
-    print(f"Policy on Mugger:{policy_mugger}; Policy on Victim:{policy_victim} → "
-          f"Homicides:{sum_homicide / years}; Arrests:{sum_jailed / years}; Active Guns:{sum_guns / years}")
+        #    overall = sum_i + sum_ii + sum_iii + sum_iv
+        save_statistics(sum_homicide, sim.return_counter()[7], sum_i, sum_ii, sum_iii, sum_iv, policy_mugger,
+                        policy_victim)
+    # save_res(sum_i, sum_ii, sum_iii, sum_iv)
+    # print(f"Policy on Mugger:{policy_mugger}; Policy on Victim:{policy_victim} → "
+    #       f"I - {sum_i / years}; II - {sum_ii / years}; III - {sum_iii / years}; IV - {sum_iv / years}")
+    # print(
+    #     f"Policy on Mugger:{policy_mugger}; Policy on Victim:{policy_victim} → "
+    #     f"I - {sum_i / overall}; II - {sum_ii / overall}; III - {sum_iii / overall}; IV - {sum_iv / overall}")
+    # print(f"Policy on Mugger:{policy_mugger}; Policy on Victim:{policy_victim} → "
+    #       f"Homicides:{sum_homicide / years}; Arrests:{sum_jailed / years}; Active Guns:{sum_guns / years}")
 
     # Call a graphic diagram to illustrate the simulation
-    sankey_prep()
+    # sankey_prep()
     # Here we remove the data by erasing all the files generated in a run, so a new run wont conflict with any
     # preexisting data in this files
-    os.remove("start.txt")
-    os.remove('step_mugging.txt')
-    os.remove('target.txt')
+    # os.remove("start.txt")
+    # os.remove('step_mugging.txt')
+    # os.remove('target.txt')
+    print(f'Success!')
 
 
 if __name__ == '__main__':
     # sankey_prep()
-    run_model(False, False)
+    # run_model(False, False)
     # print('\n')
     # run_model(True, True)
     # print('\n')
     # run_model(False, True)
     # print('\n')
     # run_model(True, False)
-    # n_jobs = 3
-    # n = 10
-    # s = pd.DataFrame()
-    # with Parallel(n_jobs=n_jobs) as parallel:
-    #     # parallel(delayed(r)(parametros da função) for i in ITERADOR: range(1000)
-    #     # O s vai ser uma lista contendo a instância o objeto do tipo Gunsim
-    #     # s = parallel(delayed(run_model)(i[0], i[1]) for i in product([True, False], repeat=2) for j in range(1000))
+    n_jobs = 3
+    n = 10
+    s = pd.DataFrame()
+    with Parallel(n_jobs=n_jobs) as parallel:
+        # parallel(delayed(r)(parametros da função) for i in ITERADOR: range(1000)
+        # O s vai ser uma lista contendo a instância o objeto do tipo Gunsim
+        s = parallel(delayed(run_model)(i[0], i[1]) for i in product([True, False], repeat=2) for j in range(100000))
     #     s = parallel(delayed(run_model)(True, True) for j in range(1000))
     # has_g = 0.0057
     # for i in range(10):
     #     run_model(True, True, gun_rate=has_g)
     #     has_g += .1
-
-
