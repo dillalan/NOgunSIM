@@ -76,6 +76,8 @@ class GunSIM:
                 victim.s_victim[0] = 'Coop' if random.random() < .9 else 'React'
                 if victim.s_victim[0] == 'React':  # But if victim remain resistant, it is rational to mugger use force
                     mugger.s_aggressor[0] = 'Force' if random.random() < .9 else 'nForce'
+        # Once there is no prediction to Mugging Game when a aggressor starts with Force, we simply choose to keep
+        # victims in Coop strategy, to ease our job in calibrating the distibuition of outcomes
         elif mugger.s_aggressor[0] == 'Force':
             victim.s_victim[0] = 'Coop' if random.random() < .95 else 'React'
         # target_sankey(mugger, victim)

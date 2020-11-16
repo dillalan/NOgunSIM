@@ -8,7 +8,7 @@ from itertools import product
 import pandas as pd
 
 
-def sankey_prep():
+def sankey_prep(policy_mugger, policy_victim):
     # Sankey Diagram is a cool way to show the strategy decisions changing with Theory of Moves rationale. The
     # diagram is made of streams that indicate how the processes start and finish. In our case we'll see the initial
     # strategies by aggressors and victims, targeting new or same strategies after we apply the Theory of Moves. The
@@ -86,7 +86,11 @@ def sankey_prep():
                    'rgba(95, 13, 227, 0.23)', 'rgba(95, 13, 227, 0.23)', 'rgba(222, 27, 216, 0.23)',
                    'rgba(222, 27, 216, 0.23)']
         ))])
-    fig.update_layout(title_text="GunSIM for classic Mugging Game(BRAMS, 1993)", font_size=15)
+    if policy_mugger == False and policy_victim == False:
+        fig.update_layout(title_text="GunSIM for classic Mugging Game(BRAMS, 1993)", font_size=15)
+    else:
+        fig.update_layout(title_text=f"GunSIM for altered Mugging Game(BRAMS, 1993) Policy on Mugger:{policy_mugger}; "
+                                     f"Policy on Victim:{policy_victim}", font_size=15)
     fig.show()
 
 
@@ -137,7 +141,7 @@ def run_model(policy_mugger, policy_victim, years=1, prob_matching=.33, gun_rate
             sum_homicide += sim.return_counter()[4]
             sum_jailed += sim.return_counter()[5]
             sum_guns += sim.return_counter()[6]
-        #    overall = sum_i + sum_ii + sum_iii + sum_iv
+        # overall = sum_i + sum_ii + sum_iii + sum_iv
         save_statistics(sum_homicide, sim.return_counter()[7], sum_i, sum_ii, sum_iii, sum_iv, policy_mugger,
                         policy_victim)
     # save_res(sum_i, sum_ii, sum_iii, sum_iv)
@@ -150,13 +154,13 @@ def run_model(policy_mugger, policy_victim, years=1, prob_matching=.33, gun_rate
     #       f"Homicides:{sum_homicide / years}; Arrests:{sum_jailed / years}; Active Guns:{sum_guns / years}")
 
     # Call a graphic diagram to illustrate the simulation
-    # sankey_prep()
+    # sankey_prep(policy_mugger, policy_victim)
     # Here we remove the data by erasing all the files generated in a run, so a new run wont conflict with any
     # preexisting data in this files
     # os.remove("start.txt")
     # os.remove('step_mugging.txt')
     # os.remove('target.txt')
-    print(f'Success!')
+        print(f'{i}')
 
 
 if __name__ == '__main__':
@@ -169,14 +173,12 @@ if __name__ == '__main__':
     # print('\n')
     # run_model(True, False)
     n_jobs = 3
-    n = 10
-    s = pd.DataFrame()
+    # n = 10
     with Parallel(n_jobs=n_jobs) as parallel:
         # parallel(delayed(r)(parametros da função) for i in ITERADOR: range(1000)
         # O s vai ser uma lista contendo a instância o objeto do tipo Gunsim
-        s = parallel(delayed(run_model)(i[0], i[1]) for i in product([True, False], repeat=2) for j in range(100000))
-    #     s = parallel(delayed(run_model)(True, True) for j in range(1000))
-    # has_g = 0.0057
-    # for i in range(10):
-    #     run_model(True, True, gun_rate=has_g)
-    #     has_g += .1
+        # s = parallel(delayed(run_model)(i[0], i[1]) for i in product([True, False], repeat=2) for j in range(1))
+        s = parallel(delayed(run_model)(False, False, prob_matching=.66) for j in range(100000))
+        s1 = parallel(delayed(run_model)(False, False, prob_matching=.99) for j in range(100000))
+        s2 = parallel(delayed(run_model)(False, False, gun_rate=.66) for j in range(100000))
+        s3 = parallel(delayed(run_model)(False, False, gun_rate=.33) for j in range(100000))
