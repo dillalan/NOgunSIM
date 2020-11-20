@@ -70,17 +70,17 @@ class GunSIM:
 
         # According to Brams the initial states are (4, 1 )("mugger fails") or (3,4) ("voluntary submission")
         if mugger.s_aggressor[0] == 'nForce':
-            if victim.s_victim[0] == 'Coop':  # It is rational to prefer stand in (3,4) ("voluntary submission")
-                victim.s_victim[0] = 'Coop' if random.random() < .86 else 'React'
-            elif victim.s_victim[0] == 'React':  # So it is changing from (4,1) ("voluntary submission") to (3,4)
-                victim.s_victim[0] = 'Coop' if random.random() < .9 else 'React'
-                if victim.s_victim[0] == 'React':  # But if victim remain resistant, it is rational to mugger use force
+            if victim.s_victim[0] == 'nResist':  # It is rational to prefer stand in (3,4) ("voluntary submission")
+                victim.s_victim[0] = 'nResist' if random.random() < .86 else 'Resist'
+            elif victim.s_victim[0] == 'Resist':  # So it is changing from (4,1) ("voluntary submission") to (3,4)
+                victim.s_victim[0] = 'nResist' if random.random() < .9 else 'Resist'
+                if victim.s_victim[0] == 'Resist':  # But if victim remain resistant, it is rational to mugger use force
                     mugger.s_aggressor[0] = 'Force' if random.random() < .9 else 'nForce'
         # Once there is no prediction to Mugging Game when a aggressor starts with Force, we simply choose to keep
         # victims in Coop strategy, to ease our job in calibrating the distibuition of outcomes
         elif mugger.s_aggressor[0] == 'Force':
-            victim.s_victim[0] = 'Coop' if random.random() < .95 else 'React'
-        # target_sankey(mugger, victim)
+            victim.s_victim[0] = 'nResist' if random.random() < .95 else 'Resist'
+        target_sankey(mugger, victim)  # Collecting data to plot Sankey
         self.mugging_game(victim, mugger)
 
     def mugging_game(self, victim, mugger):
@@ -93,7 +93,7 @@ class GunSIM:
         # I Fight: (2,2). The victim resists, and the mugger uses force. The mugger gets the victim's money but may
         # attract attention, whereas the victim is injured and loses its money. Nonetheless, the victim has achieved
         # its tertiary goal of increasing the probability of the mugger's arrest.
-        if victim.s_victim[0] == 'React' and mugger.s_aggressor[0] == 'Force':
+        if victim.s_victim[0] == 'Resist' and mugger.s_aggressor[0] == 'Force':
             mugger.wallet += victim.wallet
             self.i += 1
             if random.choices(['survive', 'perish'], [.9, .1]) == ['perish']:
@@ -104,7 +104,7 @@ class GunSIM:
                 self.jailed += 1
         # II Mugger fails: (4, 1). The victim resists the mugger, who is frightened away, and achieves all its goals.
         # The mugger achieves only its tertiary goal.
-        elif victim.s_victim[0] == 'React' and mugger.s_aggressor[0] == 'nForce':
+        elif victim.s_victim[0] == 'Resist' and mugger.s_aggressor[0] == 'nForce':
             self.ii += 1
             if random.choices(['flew', 'caught'], [.7, .3]) == ['caught']:
                 self.muggers.remove(mugger)
@@ -112,13 +112,13 @@ class GunSIM:
         # III Voluntary submission: (3,4). The victim gives up its money, and the mugger leaves the victim
         # unharmed. The mugger achieves all its goals, whereas the victim achieves its primary goal of escaping
         # unharmed.
-        elif victim.s_victim[0] == 'Coop' and mugger.s_aggressor[0] == 'nForce':
+        elif victim.s_victim[0] == 'nResist' and mugger.s_aggressor[0] == 'nForce':
             self.iii += 1
             mugger.wallet += victim.wallet
         # IV Involuntary submission: ( 1 ,3). The victim gives up its money, but the mugger uses force anyway. The
         # victim achieves none of its goals, whereas the mugger achieves its two most important goals, sacrificing
         # only its tertiary goal by taking a greater risk of getting caught.
-        elif victim.s_victim[0] == 'Coop' and mugger.s_aggressor[0] == 'Force':
+        elif victim.s_victim[0] == 'nResist' and mugger.s_aggressor[0] == 'Force':
             self.iv += 1
             mugger.wallet += victim.wallet
             if random.choices(['survive', 'perish'], [.93, .07]) == ['perish']:
@@ -145,17 +145,13 @@ class GunSIM:
                 if mugger.is_active():
                     # If criminal activity is triggered aggressor and victim make a initial decision on its response
                     # strategy. Note that agents take into account the existence of a policy.
-                    mugger.set_strategy(suspicious=self.policy_mugger)
+                    mugger.set_strategy(policy=self.policy_mugger)
                     victim.set_strategy(prob_armed=self.policy_victim)
-                    # start_sankey(mugger, victim)
+                    start_sankey(mugger, victim)  # Collecting data to plot Sankey
                     # Next its applied the Theory of Moves(BRAMS, 1993), a rationale for changing or not the previous
                     # strategy set by victim and aggressor
                     self.theory_moves(victim, mugger)
 
 
 if __name__ == '__main__':
-    brazil = GunSIM(policy_victim=True, policy_mugger=True)
-    brazil.grow_robbers()
-    brazil.grow_victims()
-    brazil.step()
-    print(brazil.return_counter())
+    pass

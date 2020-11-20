@@ -3,10 +3,6 @@ import os
 from model import GunSIM
 import plotly.graph_objects as go
 
-from joblib import Parallel, delayed
-from itertools import product
-import pandas as pd
-
 
 def sankey_prep(policy_mugger, policy_victim):
     # Sankey Diagram is a cool way to show the strategy decisions changing with Theory of Moves rationale. The
@@ -15,8 +11,8 @@ def sankey_prep(policy_mugger, policy_victim):
     # resulting choices of aggressors and victims will flow to the conclusions as stated by the matrix payoff of
     # Mugging Games.
 
-    start = {'Coop\n': 0, 'React\n': 0, 'Force\n': 0, 'nForce\n': 0}
-    switch = {'Coop\n': 0, 'React\n': 0, 'Force\n': 0, 'nForce\n': 0, '\n': 0}
+    start = {'nResist\n': 0, 'Resist\n': 0, 'Force\n': 0, 'nForce\n': 0}
+    switch = {'nResist\n': 0, 'Resist\n': 0, 'Force\n': 0, 'nForce\n': 0}
 
     # During the simulation we collected for every agent its starting point(a.k.a. the initial strategy), and its final
     # point (after passing through Theory o Moves algorithm). We saved this info in two separate text files.
@@ -46,19 +42,18 @@ def sankey_prep(policy_mugger, policy_victim):
 
     # Now we compute the number of agents who keep with its initial strategy. We do it by calculating the number of
     # agents with each initial strategy minus the ones that changed to the opposite strategy
-    kr = start['React\n'] - switch['Coop\n']
-    kc = start['Coop\n'] - switch['React\n']
+    kr = start['Resist\n'] - switch['nResist\n']
+    kc = start['nResist\n'] - switch['Resist\n']
     kf = start['Force\n'] - switch['nForce\n']
     knf = start['nForce\n'] - switch['Force\n']
 
     # Now we place all values that keep and changed strategy during the algorithm, and the final outcome into a list.
     # This list object wil be used as value in Sankey Diagram
-    value = [kr, switch['Coop\n'],
-             kc, switch['React\n'],
+    value = [kr, switch['nResist\n'],
+             kc, switch['Resist\n'],
              kf, switch['nForce\n'],
              knf, switch['Force\n'],
              res[0], res[1], res[2], res[3], res[0], res[3], res[1], res[2]]
-    print(value)
 
     fig = go.Figure(data=[go.Sankey(
         node=dict(
@@ -94,7 +89,7 @@ def sankey_prep(policy_mugger, policy_victim):
     fig.show()
 
 
-def save_res(i, ii, iii, iv):
+def save_mugging_game(i, ii, iii, iv):
     # Saving the values of each final outcome
     with open('step_mugging.txt', 'w') as f:
         f.write(f'{i}\n')
@@ -103,31 +98,25 @@ def save_res(i, ii, iii, iv):
         f.write(f'{iv}\n')
 
 
-def save_statistics(homicides, gun_rate, i, ii, iii, iv, policy_mugger, policy_victim):
+def save_data(homicides, gun_rate, i, ii, iii, iv, policy_mugger, policy_victim, match):
     # Saving the values of homicides and gun rate
     with open('homicide.txt', 'a') as f:
-        f.write(f'Homicides; Gun Rate; Mugger Policy; Victim Policy\n')
-        f.write(f'{homicides};{gun_rate}; {policy_mugger};{policy_victim}\n')
+        f.write(f'Homicides; Gun Rate; Mugger Policy; Victim Policy; Prob. Match\n')
+        f.write(f'{homicides};{gun_rate}; {policy_mugger};{policy_victim};{match}\n')
     with open('Mugging_Game.txt', 'a') as f:
-        f.write(f'I; II; III; IV; Mugger Policy; Victim Policy\n')
-        f.write(f'{i};{ii};{iii};{iv};{policy_mugger};{policy_victim}\n')
+        f.write(f'I; II; III; IV; Mugger Policy; Victim Policy; Homicides; Prob. Match; Gun Rate\n')
+        f.write(f'{i};{ii};{iii};{iv};{policy_mugger};{policy_victim};{homicides};{match};{gun_rate}\n')
 
 
-def run_model(policy_mugger, policy_victim, years=1, prob_matching=.33, gun_rate=.0057):
-    # sum_i = 0
-    # sum_ii = 0
-    # sum_iii = 0
-    # sum_iv = 0
-    # sum_homicide = 0
+def run_model(policy_mugger, policy_victim, years=10, prob_matching=.33, gun_rate=.0057):
+    sum_i = 0
+    sum_ii = 0
+    sum_iii = 0
+    sum_iv = 0
+    sum_homicide = 0
     sum_jailed = 0
     sum_guns = 0
-    # overall = 0
     for i in range(years):
-        sum_i = 0
-        sum_ii = 0
-        sum_iii = 0
-        sum_iv = 0
-        sum_homicide = 0
         for days in range(365):
             sim = GunSIM(policy_mugger=policy_mugger, policy_victim=policy_victim,
                          prob_matching=prob_matching, has_gun=gun_rate)
@@ -141,44 +130,23 @@ def run_model(policy_mugger, policy_victim, years=1, prob_matching=.33, gun_rate
             sum_homicide += sim.return_counter()[4]
             sum_jailed += sim.return_counter()[5]
             sum_guns += sim.return_counter()[6]
-        # overall = sum_i + sum_ii + sum_iii + sum_iv
-        save_statistics(sum_homicide, sim.return_counter()[7], sum_i, sum_ii, sum_iii, sum_iv, policy_mugger,
-                        policy_victim)
-    # save_res(sum_i, sum_ii, sum_iii, sum_iv)
-    # print(f"Policy on Mugger:{policy_mugger}; Policy on Victim:{policy_victim} → "
-    #       f"I - {sum_i / years}; II - {sum_ii / years}; III - {sum_iii / years}; IV - {sum_iv / years}")
-    # print(
-    #     f"Policy on Mugger:{policy_mugger}; Policy on Victim:{policy_victim} → "
-    #     f"I - {sum_i / overall}; II - {sum_ii / overall}; III - {sum_iii / overall}; IV - {sum_iv / overall}")
-    # print(f"Policy on Mugger:{policy_mugger}; Policy on Victim:{policy_victim} → "
-    #       f"Homicides:{sum_homicide / years}; Arrests:{sum_jailed / years}; Active Guns:{sum_guns / years}")
-
+        save_data(sum_homicide, sim.return_counter()[7], sum_i, sum_ii, sum_iii, sum_iv, policy_mugger,
+                  policy_victim, prob_matching)
+    save_mugging_game(sum_i, sum_ii, sum_iii, sum_iv)
     # Call a graphic diagram to illustrate the simulation
-    # sankey_prep(policy_mugger, policy_victim)
+    sankey_prep(policy_mugger, policy_victim)
     # Here we remove the data by erasing all the files generated in a run, so a new run wont conflict with any
     # preexisting data in this files
-    # os.remove("start.txt")
-    # os.remove('step_mugging.txt')
-    # os.remove('target.txt')
-        print(f'{i}')
+    os.remove("start.txt")
+    os.remove('step_mugging.txt')
+    os.remove('target.txt')
 
 
 if __name__ == '__main__':
-    # sankey_prep()
-    # run_model(False, False)
-    # print('\n')
-    # run_model(True, True)
-    # print('\n')
-    # run_model(False, True)
-    # print('\n')
-    # run_model(True, False)
-    n_jobs = 3
-    # n = 10
-    with Parallel(n_jobs=n_jobs) as parallel:
-        # parallel(delayed(r)(parametros da função) for i in ITERADOR: range(1000)
-        # O s vai ser uma lista contendo a instância o objeto do tipo Gunsim
-        # s = parallel(delayed(run_model)(i[0], i[1]) for i in product([True, False], repeat=2) for j in range(1))
-        s = parallel(delayed(run_model)(False, False, prob_matching=.66) for j in range(100000))
-        s1 = parallel(delayed(run_model)(False, False, prob_matching=.99) for j in range(100000))
-        s2 = parallel(delayed(run_model)(False, False, gun_rate=.66) for j in range(100000))
-        s3 = parallel(delayed(run_model)(False, False, gun_rate=.33) for j in range(100000))
+    run_model(False, False)
+    print('\n')
+    run_model(True, True)
+    print('\n')
+    run_model(False, True)
+    print('\n')
+    run_model(True, False)

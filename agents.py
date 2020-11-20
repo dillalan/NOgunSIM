@@ -19,14 +19,14 @@ class Victim:
         :return:
         """
         # If there is a gun policy active, there may be also a change in how an agent form his choice on strategy.
-        # The rationale is that an armed agent is prone to chose react more often than an unarmed agent.
+        # The rationale is that an armed agent is prone to chose resist more often than an unarmed agent.
         if prob_armed:
             if self.has_gun[0]:
-                self.s_victim = random.choices(['React', 'Coop'], [.8, .2])
+                self.s_victim = random.choices(['Resist', 'nResist'], [.8, .2])
             else:
-                self.s_victim = random.choices(['React', 'Coop'], [.2, .8])
+                self.s_victim = random.choices(['Resist', 'nResist'], [.2, .8])
         else:
-            self.s_victim = random.choices(['React', 'Coop'], [.5, .5])
+            self.s_victim = random.choices(['Resist', 'nResist'], [.5, .5])
 
 
 class Aggressor:
@@ -35,6 +35,7 @@ class Aggressor:
         self.unique_id = unique_id
         self.wallet = random.randint(10, 50)
         self.s_aggressor = None
+        self.suspicious = False
 
     def is_active(self):
         """
@@ -47,14 +48,15 @@ class Aggressor:
         else:
             return False
 
-    def set_strategy(self, suspicious):
+    def set_strategy(self, policy):
         """
         Function that sets a strategy to a aggressor. This choice is based on whether or not a gun policy is active
-        :param suspicious: boolean
+        :param policy: boolean
         :return:
         """
+        self.suspicious = policy
         # The rationale is that if a gun policy is active the agent chose more often to use force as a initial strategy
-        if suspicious:
+        if self.suspicious:
             self.s_aggressor = random.choices(['Force', 'nForce'], [.7, .4])
         else:
             self.s_aggressor = random.choices(['Force', 'nForce'], [.14, .86])
@@ -64,4 +66,4 @@ class Aggressor:
 
 
 if __name__ == '__main__':
-    a = Victim(1)
+    pass
